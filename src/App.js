@@ -18,7 +18,8 @@ class App extends Component {
         super(props);
         this.state = {
             position: "",
-            error: ""
+            error: "",
+            prevPosition: []
         };
         
         this.handleChanges = this.handleChanges.bind(this);
@@ -27,7 +28,11 @@ class App extends Component {
     
     handleChanges({position, error}) {
         this.setState({position: position, error: error});
+        if(!error){
+            this.setState({prevPosition: [].concat([...this.state.prevPosition], {coords: position.coords, timestamp: position.timestamp})});
+        }
     }
+
     
     handleClick() {
         watchPosition(this.handleChanges);
