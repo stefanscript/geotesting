@@ -118,7 +118,7 @@ export function testLanguage(language) {
     return 0;
 }
 export function testTimeOffsetVsUTC(offset) {
-    let v = parseInt(offset, 10) <= 6;
+    let v = parseInt(offset, 10);
 
-    return v >= 4 && v<=6 ? 100 : 0;
+    return v >= 4 && v<= 6 ? 100 : 0;
 }
