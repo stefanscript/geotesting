@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
 import './App.css';
-import {isGeoAvailable, watchPosition} from "./services/geo";
+import {geCurrentPosition, getResult, isGeoAvailable, watchPosition} from "./services/geo";
 import {
     devToolsOpen,
     getBrowserData,
     getLanguage,
     getTimezone,
-    getTimezoneOffset,
+    getTimezoneOffsetVsUTC,
     getVideoCardInfo,
     isMobile
 } from "./services/hardware";
@@ -19,23 +19,53 @@ class App extends Component {
         this.state = {
             position: "",
             error: "",
-            prevPosition: []
+            prevWatchPositions: [],
+            prevOnePositions: []
         };
         
-        this.handleChanges = this.handleChanges.bind(this);
-        this.handleClick = this.handleClick.bind(this);
+        this.handleWatchChanges = this.handleWatchChanges.bind(this);
+        this.handleWatchClick = this.handleWatchClick.bind(this);
+        this.handleOneClick = this.handleOneClick.bind(this);
+        this.handleOneChanges = this.handleOneChanges.bind(this);
+        this.downloadWatchCSV = this.downloadWatchCSV.bind(this);
+        this.downloadOneCSV = this.downloadOneCSV.bind(this);
     }
     
-    handleChanges({position, error}) {
-        this.setState({position: position, error: error});
+    handleWatchChanges({position, error}) {
+        // this.setState({position: position, error: error});
         if(!error){
-            this.setState({prevPosition: [].concat([...this.state.prevPosition], {coords: position.coords, timestamp: position.timestamp})});
+            let newEntry = {coords: {}, timestamp: position.timestamp};
+            for(let key in position.coords){
+                // if(position.coords.hasOwnProperty(key)){
+                    console.log("key: ", key, position.coords[key]);
+                    newEntry.coords[key] = position.coords[key];
+                // }
+            }
+            // {coords: position.coords, timestamp: position.timestamp}
+            this.setState({prevWatchPositions: [].concat([...this.state.prevWatchPositions], newEntry)});
+        }
+    }
+    handleOneChanges({position, error}) {
+        // this.setState({position: position, error: error});
+        if(!error){
+            let newEntry = {coords: {}, timestamp: position.timestamp};
+            for(let key in position.coords){
+                // if(position.coords.hasOwnProperty(key)){
+                    console.log("key: ", key, position.coords[key]);
+                    newEntry.coords[key] = position.coords[key];
+                // }
+            }
+            // {coords: position.coords, timestamp: position.timestamp}
+            this.setState({prevOnePositions: [].concat([...this.state.prevOnePositions], newEntry)});
         }
     }
 
     
-    handleClick() {
-        watchPosition(this.handleChanges);
+    handleWatchClick() {
+        watchPosition(this.handleWatchChanges);
+    }
+    handleOneClick() {
+        geCurrentPosition(this.handleOneChanges);
     }
     
     componentDidMount() {
@@ -44,19 +74,17 @@ class App extends Component {
     }
     
     doOnOrientationChange() {
-        // switch(window.orientation) {
-        //     case -90 || 90:
-        //         alert('landscape');
-        //         break;
-        //     default:
-        //         alert('portrait');
-        //         break;
-        // }
         if (window.innerHeight > window.innerWidth) {
             console.log("portrait");
         } else {
             console.log("landscape")
         }
+    }
+    downloadOneCSV() {
+
+    }
+    downloadWatchCSV() {
+
     }
     
     render() {
@@ -64,33 +92,119 @@ class App extends Component {
             <div className="App">
                 <header>Geolocation</header>
                 <section className="side-container">
-                    <Observation title={"Is Mobile"} value={JSON.stringify(isMobile())}/>
+                    <div className={`head` + (getResult() < 50 ? " sad" : "")}>
+                        <div className="face">
+                            <div className="mouth" />
+                            <div className="eye-group">
+                                <div className="eye eye-left" />
+                                <div className="eye eye-right" />
+                            </div>
+                        </div>
+                    </div>
+                    <div>Confidence: {getResult()}</div>
+                    {/*<Observation title={"Is Mobile"} value={JSON.stringify(isMobile())}/>*/}
                     
-                    <Observation title={"Dev Tools"} value={devToolsOpen()}/>
-                    <Observation title={"Browser data"} value={getBrowserData()}/>
-                    <Observation title={"GPU"} value={JSON.stringify(getVideoCardInfo())}/>
-                    
-                    <Observation title={"Language"} value={JSON.stringify(getLanguage())}/>
-                    <Observation title={"Timezone IANA"} value={JSON.stringify(getTimezone())}/>
-                    
-                    <Observation title={"Timezone Offset"} value={JSON.stringify(getTimezoneOffset())}/>
-                    
-                    
-                    <Check title={"Geolocation API Availability"} passed={isGeoAvailable()}/>
-                    <button onClick={this.handleClick}>Start Watching Geolocation</button>
-                    
-                    <code>{this.state.error}</code>
-                    <code>latitude: {this.state.position && this.state.position.coords.latitude}</code>
-                    <code>longitude: {this.state.position && this.state.position.coords.longitude}</code>
-                    <code>accuracy: within {this.state.position && this.state.position.coords.accuracy}m</code>
-                    <code>altitude: {this.state.position && this.state.position.coords.altitude}</code>
-                    <code>altitudeAccuracy: {this.state.position && this.state.position.coords.altitudeAccuracy}</code>
-                    <code>heading: {this.state.position && this.state.position.coords.heading}</code>
-                    <code>speed: {this.state.position && this.state.position.coords.speed}</code>
-                    <code>timestamp: {this.state.position && this.state.position.timestamp}</code>
-                    <code>Date: {this.state.position && (new Date(this.state.position.timestamp).toISOString("DD-MM-YYYY HH:mm:ss"))}</code>
-                
+                    {/*<Observation title={"Dev Tools"} value={devToolsOpen()}/>*/}
+                    {/*<Observation title={"Browser data"} value={getBrowserData()}/>*/}
+                    {/*<Observation title={"GPU"} value={JSON.stringify(getVideoCardInfo())}/>*/}
+
+                    <div className={"details"}>
+
+                        <Observation title={"Language"} value={JSON.stringify(getLanguage())}/>
+                        <Observation title={"Timezone IANA"} value={JSON.stringify(getTimezone())}/>
+
+                        <Observation title={"Timezone Offset"}
+                                     value={JSON.stringify(getTimezoneOffsetVsUTC()) + "hr(s)"}/>
+
+
+                        <Check title={"Geolocation API Availability"} passed={isGeoAvailable()}/>
+
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                        <h1> Watch Position</h1>
+                        <button onClick={this.handleWatchClick}>Start Watching Geolocation</button>
+                        <code>{this.state.error}</code>
+
+                        <ul className={"entries"}>
+                            <li key={"w0"}>
+                                <code className={"index-column"}>#</code>
+                                <code>latitude</code>
+                                <code>longitude</code>
+                                <code>accuracy</code>
+                                <code>altitude</code>
+                                <code>altitudeAccuracy</code>
+                                <code>heading</code>
+                                <code>speed</code>
+                                <code>timestamp</code>
+                                {/*<code>Date: {this.state.position && (new Date(this.state.position.timestamp).toISOString("DD-MM-YYYY HH:mm:ss"))}</code>*/}
+                            </li>
+                                {this.state.prevWatchPositions.map((pos, index) => (
+                                    <li key={"w" + index}>
+                                        <code className={"index-column"}>{index}.</code>
+                                        <code>{pos.coords.latitude}</code>
+                                        <code>{pos.coords.longitude}</code>
+                                        <code>{pos.coords.accuracy}m</code>
+                                        <code>{pos.coords.altitude}</code>
+                                        <code>{pos.coords.altitudeAccuracy}</code>
+                                        <code>{pos.coords.heading}</code>
+                                        <code>{pos.coords.speed}</code>
+                                        <code>{pos.timestamp}</code>
+                                        {/*<code>Date: {this.state.position && (new Date(this.state.position.timestamp).toISOString("DD-MM-YYYY HH:mm:ss"))}</code>*/}
+                                    </li>))
+                                }
+                        </ul>
+                        <a href="" id="downloadwatchCSV" onClick={this.downloadWatchCSV}>Download CSV</a>
+
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                        <br />
+                        <h1> One time Position</h1>
+                        <button onClick={this.handleOneClick}>Get Quick Geolocation</button>
+                        <ul className={"entries"}>
+                            <li key="0">
+                                <code className={"index-column"}>#</code>
+                                <code>latitude</code>
+                                <code>longitude</code>
+                                <code>accuracy</code>
+                                <code>altitude</code>
+                                <code>altitudeAccuracy</code>
+                                <code>heading</code>
+                                <code>speed</code>
+                                <code>timestamp</code>
+                                {/*<code>Date: {this.state.position && (new Date(this.state.position.timestamp).toISOString("DD-MM-YYYY HH:mm:ss"))}</code>*/}
+                            </li>
+                            {this.state.prevOnePositions.map((pos, index) => (
+                                <li key={index}>
+                                    <code className={"index-column"}>{index}.</code>
+                                    <code>{pos.coords.latitude}</code>
+                                    <code>{pos.coords.longitude}</code>
+                                    <code>{pos.coords.accuracy}m</code>
+                                    <code>{pos.coords.altitude}</code>
+                                    <code>{pos.coords.altitudeAccuracy}</code>
+                                    <code>{pos.coords.heading}</code>
+                                    <code>{pos.coords.speed}</code>
+                                    <code>{pos.timestamp}</code>
+                                    {/*<code>Date: {this.state.position && (new Date(this.state.position.timestamp).toISOString("DD-MM-YYYY HH:mm:ss"))}</code>*/}
+                                </li>))
+                            }
+                        </ul>
+                        <a href="" id="downloadoneCSV" onClick={this.downloadOneCSV}>Download CSV</a>
+                    </div>
                 </section>
+                <footer />
             </div>
         );
     }

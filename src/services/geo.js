@@ -1,3 +1,5 @@
+import {getLanguage, getTimezone, getTimezoneOffsetVsUTC} from "./hardware";
+
 const options = {
     enableHighAccuracy: true,
     timeout: 10000,
@@ -5,6 +7,7 @@ const options = {
 };
 
 let geoHandler;
+let geoHandlerOne;
 let data = {
     position: "",
     error: ""
@@ -14,8 +17,9 @@ export function isGeoAvailable() {
     return "geolocation" in navigator;
 }
 
-export function geCurrentPosition() {
+export function geCurrentPosition(handler) {
     if (isGeoAvailable()) {
+        geoHandlerOne = handler;
         navigator.geolocation.getCurrentPosition(successHandler, errorHandler, options);
     }
 }
@@ -23,9 +27,11 @@ export function geCurrentPosition() {
 function successHandler(pos) {
     console.log("g1");
     var crd = pos.coords;
-    
+
     data.position = pos;
-    geoHandler && geoHandler({position: data.position});
+    console.log(pos);
+    geoHandlerOne && geoHandlerOne({position: pos});
+
     console.log('Your current position is:');
     console.log(`Latitude : ${crd.latitude}`);
     console.log(`Longitude: ${crd.longitude}`);
@@ -50,6 +56,7 @@ function errorHandler(err) {
     data.error = `ERROR(${err.code}): reason: ${reason}, ${err.message}`;
     
     geoHandler && geoHandler({error: data.error});
+    geoHandlerOne && geoHandlerOne({error: data.error});
     console.warn(data.error);
 }
 
@@ -75,4 +82,41 @@ function successWatchHandler(pos) {
     console.log(`Latitude : ${crd.latitude}`);
     console.log(`Longitude: ${crd.longitude}`);
     console.log(`More or less ${crd.accuracy} meters.`);
+}
+
+
+export function getResult() {
+    let result = 0;
+    let tests = 0;
+    result += testLanguage(getLanguage());
+    tests++;
+    result += testIANATimezone(getTimezone());
+    tests++;
+    result += testTimeOffsetVsUTC(getTimezoneOffsetVsUTC());
+    tests++;
+
+    return parseInt(result/tests, 10);
+}
+
+export function getResultSub50() {
+    return 20;
+}
+
+
+export function getResultOver70() {
+    return 71;
+}
+
+export function testIANATimezone(timezone) {
+    return String(timezone).toLowerCase() === "america/toronto" ? 100 : 0;
+}
+export function testLanguage(language) {
+    //
+    if(language === "en-CA" || language === "fr-CA" || language === "en") {
+        return 100;
+    }
+    return 0;
+}
+export function testTimeOffsetVsUTC(offset) {
+    return parseInt(offset, 10) === -5 ? 100 : 0;
 }

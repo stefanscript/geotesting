@@ -38,11 +38,16 @@ export function getLanguage() {
     return (navigator.languages && navigator.languages.length) ? navigator.languages[0] : navigator.userLanguage || navigator.language || navigator.browserLanguage || 'en';
 }
 
-export function getTimezoneOffset() {
-    return new Date().getTimezoneOffset();
+export function getTimezoneOffsetVsUTC() {
+    return (new Date().getTimezoneOffset())/60 ;
 }
 export function getTimezone() {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    try{
+        return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    } catch(err){
+        return "";
+    }
+
 }
 
 export function isMobile() {

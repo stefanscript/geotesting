@@ -30,34 +30,161 @@ button {
   margin: 0 0 40px;
 }
 
+a {
+  color: #fff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+footer {
+  height: 200px;
+}
+
+
+/*.ok:after{*/
+/*  content: "\02705";*/
+/*  position: relative;*/
+/*  margin-left: 20px;*/
+/*}*/
+/*.not-ok:after{*/
+/*  content: "\0274C";*/
+/*  position: relative;*/
+/*  margin-left: 20px;*/
+/*}*/
+
+/*.ok-face:after {*/
+/*  content: "\01F60A";*/
+/*  position: relative;*/
+/*}*/
+
+/*.not-ok-face:after {*/
+/*  content: "\01F621";*/
+/*  position: relative;*/
+/*}*/
+
+.entries {
+  list-style: none;
+  padding:0;
+  margin-bottom: 20px;
+}
+.entries li {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-around;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+
+}
 pre,
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
-  font-size: 0.7em;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #fff;
-  max-width: 100vh;
+  monospace;
+  display: block;
 }
 
-.ok:after{
-  content: "\02705";
-  position: relative;
-  margin-left: 20px;
+
+.details {
+  font-size: 0.5em;
+  width: 90%;
 }
-.not-ok:after{
-  content: "\0274C";
-  position: relative;
-  margin-left: 20px;
+.entries code {
+  width: 100px;
+}
+code.index-column,
+.index-column {
+  width: 20px;
 }
 
-.ok-face:after {
-  content: "\01F60A";
-  position: relative;
+.face, .head, .mouth, .eye-group, .eye-left, .eye-right,.eye {
+  position: absolute;
 }
 
-.not-ok-face:after {
-  content: "\01F621";
+.face:before, .head:before,.mouth:before, .eye-group:before, .eye-left:before, .eye-right:before, .eye:before,
+.face:after, .head:after,.mouth:after, .eye-group:after, .eye-left:after, .eye-right:after, .eye:after {
+  position: absolute;
+  content: '';
+}
+
+.head {
   position: relative;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background-color: #FBD671;
+  box-shadow: inset -10px -10px 0 #f8b90e;
+  transform: scale(0.8);
+  transition: all .4ms ease-in-out;
+}
+
+.face {
+  width: 150px;
+  height: 170px;
+  left: 75px;
+  top: 75px;
+  transition: inherit;
+}
+
+.mouth {
+  width: 100%;
+  height: 75px;
+  bottom: 0;
+  left: 0;
+  background-color: #20184E;
+  border-radius: 10px 10px 150px 150px;
+  border: 5px solid #20184E;
+  overflow: hidden;
+  transition: inherit;
+}
+.mouth:after {
+  width: 100px;
+  height: 80px;
+  left: 25px;
+  top: 30px;
+  background-color: #F15962;
+  border-radius: 50%;
+}
+
+.eye-group {
+  top: 10px;
+  width: 150px;
+  height: 50px;
+  transition: inherit;
+}
+.eye-group .eye {
+  background-color: #20184E;
+  width: 30px;
+  height: 50px;
+  border-radius: 100%;
+  border: 5px solid #20184E;
+  transition: inherit;
+}
+.eye-group .eye:after {
+  width: 10px;
+  height: 15px;
+  top: 5px;
+  background-color: #FBD671;
+  border-radius: 50%;
+  transition: inherit;
+}
+.eye-group .eye.eye-left {
+  left: 15px;
+  transition: inherit;
+}
+.eye-group .eye.eye-right {
+  right: 15px;
+  transition: inherit;
+}
+
+.head.sad .mouth{
+  transform: rotate(180deg);
+}
+.head.sad .mouth{
+  transform: rotate(180deg);
+}
+.head.sad{
+  background: #b22222;
+  box-shadow: inset -10px -10px 0 #b22222;
 }
