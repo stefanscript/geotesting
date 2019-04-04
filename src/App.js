@@ -155,7 +155,7 @@ class App extends Component {
                                         <code>{pos.coords.altitudeAccuracy}</code>
                                         <code>{pos.coords.heading}</code>
                                         <code>{pos.coords.speed}</code>
-                                        <code>{pos.timestamp}</code>
+                                        <code>+{pos.timestamp - this.state.prevWatchPositions[0].timestamp } {(pos.timestamp + "").length === 10 ? "sec" : "ms"}</code>
                                         {/*<code>Date: {this.state.position && (new Date(this.state.position.timestamp).toISOString("DD-MM-YYYY HH:mm:ss"))}</code>*/}
                                     </li>))
                                 }
@@ -186,7 +186,7 @@ class App extends Component {
                                 <code>timestamp</code>
                                 {/*<code>Date: {this.state.position && (new Date(this.state.position.timestamp).toISOString("DD-MM-YYYY HH:mm:ss"))}</code>*/}
                             </li>
-                            {this.state.prevOnePositions.map((pos, index) => (
+                            {this.state.prevOnePositions && this.state.prevOnePositions.map((pos, index) => (
                                 <li key={index}>
                                     <code className={"index-column"}>{index}.</code>
                                     <code>{pos.coords.latitude}</code>
@@ -196,7 +196,7 @@ class App extends Component {
                                     <code>{pos.coords.altitudeAccuracy}</code>
                                     <code>{pos.coords.heading}</code>
                                     <code>{pos.coords.speed}</code>
-                                    <code>{pos.timestamp}</code>
+                                    <code>+{pos.timestamp - this.state.prevOnePositions[0].timestamp } {(pos.timestamp + "").length === 10 ? "sec" : "ms"}</code>
                                     {/*<code>Date: {this.state.position && (new Date(this.state.position.timestamp).toISOString("DD-MM-YYYY HH:mm:ss"))}</code>*/}
                                 </li>))
                             }
