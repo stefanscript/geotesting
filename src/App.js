@@ -14,17 +14,10 @@ import {Check} from "./Check";
 import {Observation} from "./Observation";
 
 
-const csvRow = function(dataObject) {
-    let dataArray = [];
-    for (let o in dataObject.coords) {
-        if(dataObject.coords.hasOwnProperty(o)){
-            let innerValue = dataObject.coords[o] === null ? '' : dataObject.coords[o].toString();
-            // let result = innerValue.replace(/"/g, '""');
-            // result = '"' + result + '"';
-            dataArray.push(innerValue);
-        }
-
-    }
+const csvRow = function(dataObject, heading) {
+    let dataArray = heading.map(hr => {
+        return dataObject.coords[hr] === null ? '' : dataObject.coords[hr].toString();
+    });
     dataArray.push(dataObject.timestamp);
     return dataArray.join(',') + '\r\n';
 };
@@ -37,11 +30,12 @@ const exportToCSV = function(id, name, arrData) {
 
     let csvContent = "data:text/csv;charset=utf-8,";
 
+    let heading = "latitude,longitude,accuracy,altitude,altitudeAccuracy,heading,speed".split(",");
     // headers
-    csvContent += `latitude,longitude,accuracy,altitude,altitudeAccuracy,heading,speed,timestamp`+ '\r\n';
+    csvContent += heading.join(",") +',timestamp'+ '\r\n';
 
     arrData.forEach(function(item){
-        csvContent += csvRow(item);
+        csvContent += csvRow(item, heading);
     });
 
     let encodedUri = encodeURI(csvContent);
