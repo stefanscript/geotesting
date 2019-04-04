@@ -247,7 +247,7 @@ class App extends Component {
                                 </li>))
                             }
                         </ul>
-                        <a href="" id="downloadoneCSV" onClick={this.downloadOneCSV}>Download CSV</a>
+                        <a id="downloadoneCSV" onClick={this.downloadOneCSV}>Download CSV</a>
                     </div>
                 </section>
                 <footer />
