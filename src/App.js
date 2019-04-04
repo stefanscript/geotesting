@@ -43,6 +43,8 @@ class App extends Component {
             }
             // {coords: position.coords, timestamp: position.timestamp}
             this.setState({prevWatchPositions: [].concat([...this.state.prevWatchPositions], newEntry)});
+        } else {
+            this.setState({ error: error});
         }
     }
     handleOneChanges({position, error}) {
@@ -57,6 +59,8 @@ class App extends Component {
             }
             // {coords: position.coords, timestamp: position.timestamp}
             this.setState({prevOnePositions: [].concat([...this.state.prevOnePositions], newEntry)});
+        } else {
+            this.setState({ error: error});
         }
     }
 

@@ -68,7 +68,9 @@ footer {
 .entries {
   list-style: none;
   padding:0;
-  margin-bottom: 20px;
+  margin: 0 auto 20px;
+  width: 100%;
+  overflow: scroll;
 }
 .entries li {
   display: flex;
@@ -76,8 +78,7 @@ footer {
   justify-content: space-around;
   margin-bottom: 10px;
   padding-bottom: 10px;
-  overflow: scroll;
-  width: 1000px;
+  min-width: 1000px;
 
 }
 pre,
@@ -99,7 +100,7 @@ code {
 }
 code.index-column,
 .index-column {
-  width: 20px;
+  width: 40px;
 }
 
 .face, .head, .mouth, .eye-group, .eye-left, .eye-right,.eye {
