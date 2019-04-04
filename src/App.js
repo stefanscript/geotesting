@@ -13,12 +13,55 @@ import {
 import {Check} from "./Check";
 import {Observation} from "./Observation";
 
+
+const csvRow = function(dataObject) {
+    let dataArray = [];
+    for (let o in dataObject.coords) {
+        if(dataObject.coords.hasOwnProperty(o)){
+            let innerValue = dataObject.coords[o] === null ? '' : dataObject.coords[o].toString();
+            // let result = innerValue.replace(/"/g, '""');
+            // result = '"' + result + '"';
+            dataArray.push(innerValue);
+        }
+
+    }
+    dataArray.push(dataObject.timestamp);
+    return dataArray.join(',') + '\r\n';
+};
+
+const exportToCSV = function(id, name, arrData) {
+
+    if (!arrData.length) {
+        return;
+    }
+
+    let csvContent = "data:text/csv;charset=utf-8,";
+
+    // headers
+    csvContent += `latitude,longitude,accuracy,altitude,altitudeAccuracy,heading,speed,timestamp`+ '\r\n';
+
+    arrData.forEach(function(item){
+        csvContent += csvRow(item);
+    });
+
+    let encodedUri = encodeURI(csvContent);
+    let link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "customers.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    link.click();
+    console.log("clicked");
+};
+
 class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
             position: "",
             error: "",
+            errorOne: "",
             prevWatchPositions: [],
             prevOnePositions: []
         };
@@ -60,12 +103,12 @@ class App extends Component {
             // {coords: position.coords, timestamp: position.timestamp}
             this.setState({prevOnePositions: [].concat([...this.state.prevOnePositions], newEntry)});
         } else {
-            this.setState({ error: error});
+            this.setState({ errorOne: error});
         }
     }
 
     
-    handleWatchClick() {
+    handleWatchClick(e) {
         watchPosition(this.handleWatchChanges);
     }
     handleOneClick() {
@@ -84,11 +127,15 @@ class App extends Component {
             console.log("landscape")
         }
     }
-    downloadOneCSV() {
-
+    downloadOneCSV(event) {
+        event.stopPropagation();
+        exportToCSV("downloadoneCSV", "getCurrentPosition", this.state.prevOnePositions);
+        return false;
     }
-    downloadWatchCSV() {
-
+    downloadWatchCSV(event) {
+        event.stopPropagation();
+        exportToCSV("downloadwatchCSV", "watchPosition", this.state.prevWatchPositions);
+        return false;
     }
     
     render() {
@@ -164,7 +211,7 @@ class App extends Component {
                                     </li>))
                                 }
                         </ul>
-                        <a href="" id="downloadwatchCSV" onClick={this.downloadWatchCSV}>Download CSV</a>
+                        <a id="downloadwatchCSV" onClick={this.downloadWatchCSV}>Download CSV</a>
 
                         <br />
                         <br />
@@ -177,6 +224,7 @@ class App extends Component {
                         <br />
                         <h1> One time Position</h1>
                         <button onClick={this.handleOneClick}>Get Quick Geolocation</button>
+                        <code>{this.state.error}</code>
                         <ul className={"entries"}>
                             <li key="0">
                                 <code className={"index-column"}>#</code>
