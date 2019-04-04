@@ -76,6 +76,8 @@ footer {
   justify-content: space-around;
   margin-bottom: 10px;
   padding-bottom: 10px;
+  overflow: scroll;
+  width: 1000px;
 
 }
 pre,
@@ -91,7 +93,9 @@ code {
   width: 90%;
 }
 .entries code {
-  width: 100px;
+  width: 200px;
+  margin: 0 20px 0 0;
+  display: block;
 }
 code.index-column,
 .index-column {
