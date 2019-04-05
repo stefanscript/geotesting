@@ -44,26 +44,26 @@ footer {
 }
 
 
-/*.ok:after{*/
-/*  content: "\02705";*/
-/*  position: relative;*/
-/*  margin-left: 20px;*/
-/*}*/
-/*.not-ok:after{*/
-/*  content: "\0274C";*/
-/*  position: relative;*/
-/*  margin-left: 20px;*/
-/*}*/
+.ok:after{
+  content: "\02705";
+  position: relative;
+  margin-left: 10px;
+}
+.not-ok:after{
+  content: "\0274C";
+  position: relative;
+  margin-left: 10px;
+}
 
-/*.ok-face:after {*/
-/*  content: "\01F60A";*/
-/*  position: relative;*/
-/*}*/
+.ok-face:after {
+  content: "\01F60A";
+  position: relative;
+}
 
-/*.not-ok-face:after {*/
-/*  content: "\01F621";*/
-/*  position: relative;*/
-/*}*/
+.not-ok-face:after {
+  content: "\01F621";
+  position: relative;
+}
 
 .entries {
   list-style: none;

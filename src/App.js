@@ -162,6 +162,7 @@ class App extends Component {
                         <Observation title={"HasLiedLanguages"} value={JSON.stringify(finger.getHasLiedLanguages())}/>
                         <Observation title={"HasLiedResolution"} value={JSON.stringify(finger.getHasLiedResolution())}/>
 
+                        <hr />
                         <Observation title={"Language"} value={JSON.stringify(getLanguage())}/>
                         <Observation title={"Timezone IANA"} value={JSON.stringify(getTimezone())}/>
 
