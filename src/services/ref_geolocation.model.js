@@ -56,159 +56,11 @@ var GeolocationModel = Backbone.Model.extend({
         this.on('getOnePosition', this._getOneCurrentLocation, this);
         this.on('watchLocation', this.trackLocation, this);
 
-
-    },
-
-    /**
-     * if geolocation is supported and the location is not already being tracked, obtains the location using the watchPosition method.
-     * if successful, saves the position by triggering an APISuccess event.
-     * if not, report the error by triggering an APIError event.
-     *
-     * @method public trackLocation
-     * @param {String} the view calling the function
-     */
-    trackLocation: function (view) {
-        this.flow.push(32);
-        console.log('trackLocation called.');
-
-        var that = this;
-
-
-        if (navigator.geolocation) {
-
-            this.flow.push(33);
-
-            if (typeof this.locationID !== 'undefined') {
-                this.flow.push(42);
-                this.stopTrackLocation();
+            if('Blackberry' === ClientInfo.platformName() && '7' === ClientInfo.platformVersion()[0]){
+                console.log('Blackberry 7 detected, disabling high location accuracy...');
+                Conf.HIGH_LOCATION_ACCURACY = false;
             }
-
-            this.set('isLocationBeingObserved', true);
-            this.locationID = navigator.geolocation.watchPosition(
-                function (data) {
-                    that.trigger('APISuccess', {view: view, data: data, method: 'watchPosition'});
-                },
-                function (data) {
-                    that.trigger('APIError', {view: view, data: data, method: 'watchPosition'});
-                },
-                {
-                    enableHighAccuracy: HIGH_LOCATION_ACCURACY,
-                    maximumAge: MAX_LOCATION_AGE,
-                    timeout: MAX_LOCATION_TIMEOUT
-                }
-            );
-            /*}
-             else{
-             this.flow.push(34);
-             console.log('locationID NOT undefined! isLocationBeingObserved: ' + this.get('isLocationBeingObserved'));
-             //TODO: place a timeout (60secs) if no responses then manually trigger error
-             }*/
-        }
-        else {
-            throw new Error('Geolocation not supported!');
-        }
-
-    },
-
-    /**
-     * saves the position data, after obscuring it, in WebAppStorage.
-     * triggers a positionAvailable event passing the location.
-     * stops to observe location, if it's being observed and logs the data in the console.
-     *
-     * @method private savePosition
-     * @param {Position} the geolocation position data to save.
-     */
-    _savePosition: function (position) {
-        this.flow.push(19);
-        console.log('_savePosition called.');
-
-        var timestamp = position.data.timestamp,
-            currTimestamp = new Date(),
-            oldGeoData = this._getLastLocation();
-
-        console.log('timestamp returned: ' + timestamp);
-        console.log('timestamp formatted: ' + new Date(timestamp));
-        console.log('current timestamp: ' + currTimestamp.getTime());
-        console.log('current timestamp formatted: ' + currTimestamp);
-
-        //workaround for old android phones...
-        if ('number' !== typeof timestamp) {
-            this.flow.push(20);
-            timestamp = new Date(timestamp).getTime();
-        }
-
-        //verify that the timestamp is in milliseconds and correct it if not...
-        if (timestamp.toString().length === 16) {
-            this.flow.push(21);
-            console.log('Timestamp of 16 digits! Reducing it...(' + timestamp.toString() + ')');
-            timestamp = Math.floor(timestamp / 1000);
-        }
-        else if (timestamp.toString().length !== 13) {
-            this.flow.push(22);
-            //workaround for android stock browser...
-            console.log('API time = ' + timestamp + ', setting it to the current time (' + currTimestamp.getTime() + ')');
-            timestamp = currTimestamp.getTime();
-        }
-
-        //assert that the new acquired location is not equal to the older one to proceed.
-        if (timestamp <= oldGeoData.timestamp || currTimestamp.getTime() - timestamp > Conf.prev_location_time) {
-            this.flow.push(23);
-            console.log('Last location acquired is STILL older than 10 mins or not acceptable. old one: ' + oldGeoData.timestamp + ', new one: ' + position.data.timestamp);
-            this._reportError({view: position.view, data: {code: 6}});
-        }
-        else {
-            this.flow.push(24);
-            this.set('attemptN', 0);
-
-            //if the location is returned by getCurrentPosition, ignore it and restart watchPosition
-            if (position.method === 'getCurrentPosition') {
-                this.flow.push(25);
-                console.log('Location received from getCurrentPosition with accuracy: ' + position.data.coords.accuracy + 'm. Restarting watchLocation.');
-                this.currPosition = undefined;
-                this.trackLocation(position.view);
-            }
-            //if the location is returned by watchPosition, continue
-            else if (position.method === 'watchPosition') {
-                this.flow.push(26);
-                console.log('Location received from watchPosition.');
-
-                if (position.data.coords.accuracy < Conf.min_location_accuracy) {
-                    this.flow.push(27);
-                    console.log('Location accuracy within ' + Conf.min_location_accuracy + 'm. (' + position.data.coords.accuracy + ').');
-
-                    var locData = {
-                        latitude: position.data.coords.latitude,
-                        longitude: position.data.coords.longitude,
-                        accuracy: position.data.coords.accuracy,
-                        timestamp: timestamp,
-                        flow: this.flow,
-                        view: position.view
-                    };
-
-                    if (this.lastSaved === undefined || new Date().getTime() - this.lastSaved >= Conf.last_location_min_time) {
-                        this.flow.push(28);
-
-                        //remove the error timeout
-                        window.clearTimeout(this.timeoutSwitch);
-                        this.timeoutSwitch = undefined;
-
-                        console.log('Last location saved more than a minute ago, saving the new one in WebAppStorage...');
-                        WebAppStorage.setItem('eggsBCLC', this._obscurePosition(position.data.coords.latitude + ',' + position.data.coords.longitude + ',' + position.data.coords.accuracy + ',' + timestamp));
-                        this.lastSaved = new Date().getTime();
-                    }
-
-                    this.trigger('positionAvailable', locData);
-                }
-                else {
-                    this.flow.push(29);
-                    console.log('BAD accuracy: ' + position.data.coords.accuracy);
-                    this._reportError({view: position.view, data: {code: 7}});
-                }
-            }
-        }
-
-        this._logCoords(position.data);
-    },
+        },
 
     /**
      * stops to observe location, if being observed.
@@ -418,46 +270,226 @@ var GeolocationModel = Backbone.Model.extend({
         return y ? b + t : !t;
     },
 
+        /**
+         * saves the position data, after obscuring it, in WebAppStorage.
+         * triggers a positionAvailable event passing the location.
+         * stops to observe location, if it's being observed and logs the data in the console.
+         *
+         * @method private savePosition
+         * @param {Position} the geolocation position data to save.
+         */
+        //position = {view: view, data: data, method: 'getCurrentPosition'}
+        _savePosition : function (position) {
+            this.flow.push(19);
+            console.log('_savePosition called.');
 
+            var timestamp = position.data.timestamp,
+            currTimestamp = new Date(),
+            oldGeoData = this._getLastLocation();
 
-    /**
-     * if geolocation is supported, obtains the location using the getCurrentPosition method.
-     * if successful, saves the position by triggering an APISuccess event.
-     * if not, report the error by triggering an APIError event.
-     *
-     * @method private getOneCurrentLocation
-     */
-    _getOneCurrentLocation: function (view) {
-        this.flow.push(30);
-        console.log('_getOneCurrentLocation called.');
+            console.log('timestamp returned: ' + timestamp);
+            console.log('timestamp formatted: ' + new Date(timestamp));
+            console.log('current timestamp: ' + currTimestamp.getTime());
+            console.log('current timestamp formatted: ' + currTimestamp);
 
-        var that = this;
-
-        if (navigator.geolocation) {
-            if (typeof this.currPosition === 'undefined') {
-                this.flow.push(31);
-                console.log('getCurrentPosition actually called (not being used by other flows..)');
-                this.currPosition = 1;
-                navigator.geolocation.getCurrentPosition(
-                    function (data) {
-                        that.trigger('APISuccess', {view: view, data: data, method: 'getCurrentPosition'});
-                    },
-                    function (data) {
-                        that.trigger('APIError', {view: view, data: data, method: 'getCurrentPosition'});
-                    },
-                    {
-                        enableHighAccuracy: Conf.HIGH_LOCATION_ACCURACY,
-                        maximumAge: Conf.MAX_LOCATION_AGE,
-                        timeout: Conf.MAX_LOCATION_TIMEOUT
-                    }
-                );
+            //workaround for old android phones...
+            if('number' !== typeof timestamp){
+                this.flow.push(20);
+                timestamp = new Date(timestamp).getTime();
             }
-        }
-        else {
-            throw new Error('Geolocation not supported!');
-        }
-    },
 
+            //verify that the timestamp is in milliseconds and correct it if not...
+            if(timestamp.toString().length === 16){
+                this.flow.push(21);
+                console.log('Timestamp of 16 digits! Reducing it...(' + timestamp.toString() + ')');
+                timestamp = Math.floor(timestamp/1000);
+            }
+            else if(timestamp.toString().length !== 13){
+                this.flow.push(22);
+              //workaround for android stock browser...
+                console.log('API time = ' + timestamp + ', setting it to the current time (' + currTimestamp.getTime() + ')');
+                timestamp = currTimestamp.getTime();
+            }
+
+            //assert that the new acquired location is not equal to the older one to proceed.
+            if(timestamp <= oldGeoData.timestamp || currTimestamp.getTime() - timestamp > Conf.prev_location_time){
+                this.flow.push(23);
+                console.log('Last location acquired is STILL older than 10 mins or not acceptable. old one: ' + oldGeoData.timestamp + ', new one: ' + position.data.timestamp);
+                this._reportError({view: position.view, data:{code: 6}});
+            }
+            else{
+                this.flow.push(24);
+                this.set('attemptN', 0);
+
+                //if the location is returned by getCurrentPosition, ignore it and restart watchPosition
+                if(position.method === 'getCurrentPosition'){
+                    this.flow.push(25);
+                    console.log('Location received from getCurrentPosition with accuracy: ' + position.data.coords.accuracy + 'm. Restarting watchLocation.');
+                    this.currPosition = undefined;
+                    this.trackLocation(position.view);
+                }
+              //if the location is returned by watchPosition, continue
+                else if(position.method === 'watchPosition'){
+                    this.flow.push(26);
+                    console.log('Location received from watchPosition.');
+
+                    if(position.data.coords.accuracy < Conf.min_location_accuracy){
+                        this.flow.push(27);
+                        console.log('Location accuracy within ' + Conf.min_location_accuracy + 'm. (' + position.data.coords.accuracy + ').');
+
+                        var locData = {latitude: position.data.coords.latitude, longitude: position.data.coords.longitude, accuracy: position.data.coords.accuracy, timestamp: timestamp, flow: this.flow, view: position.view};
+
+                        if(this.lastSaved === undefined || new Date().getTime() - this.lastSaved >= Conf.last_location_min_time){
+                            this.flow.push(28);
+
+                            //remove the error timeout
+                            window.clearTimeout(this.timeoutSwitch);
+                            this.timeoutSwitch = undefined;
+
+                            console.log('Last location saved more than a minute ago, saving the new one in WebAppStorage...');
+                            WebAppStorage.setItem('eggsBCLC', this._obscurePosition(position.data.coords.latitude + ',' + position.data.coords.longitude + ',' + position.data.coords.accuracy + ',' + timestamp));
+                            this.lastSaved = new Date().getTime();
+                        }
+
+                        this.trigger('positionAvailable', locData);
+                    }
+                    else{
+                        this.flow.push(29);
+                        console.log('BAD accuracy: ' + position.data.coords.accuracy);
+                        this._reportError({view: position.view, data:{code: 7}});
+                    }
+                }
+            }
+
+            this._logCoords(position.data);
+        },
+
+        /**
+         * if geolocation is supported, obtains the location using the getCurrentPosition method.
+         * if successful, saves the position by triggering an APISuccess event.
+         * if not, report the error by triggering an APIError event.
+         *
+         * @method private getOneCurrentLocation
+         */
+        _getOneCurrentLocation : function (view) {
+            this.flow.push(30);
+            console.log('_getOneCurrentLocation called.');
+
+            var that = this;
+
+            if (navigator.geolocation) {
+                if(typeof this.currPosition === 'undefined'){
+                    this.flow.push(31);
+                    console.log('getCurrentPosition actually called (not being used by other flows..)');
+                    this.currPosition = 1;
+                    navigator.geolocation.getCurrentPosition(
+                            function(data) { that.trigger('APISuccess', {view: view, data: data, method: 'getCurrentPosition'}); },
+                            function(data) { that.trigger('APIError', {view: view, data: data, method: 'getCurrentPosition'}); },
+                            {
+                                enableHighAccuracy: Conf.HIGH_LOCATION_ACCURACY,
+                                maximumAge: Conf.MAX_LOCATION_AGE,
+                                timeout: Conf.MAX_LOCATION_TIMEOUT
+                            }
+                    );
+                }
+            }
+            else {
+                throw new Error('Geolocation not supported!');
+            }
+        },
+
+        /**
+         * for iframe-wrapped apps, request geolocation to the parent frame.
+         *
+         * @method private _externalTracking
+         * @param {String} the view calling geolocation
+         */
+        _externalTracking : function (view) {
+
+            console.log('External tracking called.');
+            var that = this;
+
+        //TODO: kill the listener
+                var oldGeolocationData = WebAppStorage.getItem('eggsBCLC');
+                $(window).on('storage', function (e) {
+                   if(oldGeolocationData !== WebAppStorage.getItem('eggsBCLC')){
+
+                       //kill the listener..
+                       $(window).on('storage');
+                       console.log('location obtained from main frame!');
+                       var lastLocation = that._getLastLocation();
+                       lastLocation.flow = that.flow;
+                       lastLocation.view = view;
+                       that.trigger('positionAvailable', lastLocation);
+                   }
+                });
+                //REQUEST COMMON LOCATION
+                WebAppStorage.setItem('requestLocation', new Date().getTime());
+
+        },
+
+        /**
+         * internal geolocation tracking
+         *
+         * @method private _internalTracking
+         * @param {String} the view calling geolocation
+         */
+        _internalTracking : function (view) {
+
+            console.log('Internal tracking called.');
+
+            var that = this;
+
+            if(typeof this.locationID === 'undefined'){
+                    this.flow.push(33);
+                    this.set('isLocationBeingObserved', true);
+                    this.locationID = navigator.geolocation.watchPosition(
+                            function(data) { that.trigger('APISuccess', {view: view, data: data, method: 'watchPosition'}); },
+                            function(data) { that.trigger('APIError', {view: view, data: data, method: 'watchPosition'}); },
+                            {
+                                enableHighAccuracy: Conf.HIGH_LOCATION_ACCURACY,
+                                maximumAge: Conf.MAX_LOCATION_AGE,
+                                timeout: Conf.MAX_LOCATION_TIMEOUT
+                            }
+                        );
+                }
+                else{
+                    this.flow.push(34);
+                    console.log('locationID NOT undefined! isLocationBeingObserved: ' + this.get('isLocationBeingObserved'));
+                    //TODO: place a timeout (60secs) if no responses then manually trigger error
+                }
+        },
+
+        /**
+         * if geolocation is supported and the location is not already being tracked, obtains the location using the watchPosition method.
+         * if successful, saves the position by triggering an APISuccess event.
+         * if not, report the error by triggering an APIError event.
+         *
+         * @method public trackLocation
+         * @param {String} the view calling the function
+         */
+         trackLocation : function (view) {
+             this.flow.push(32);
+            console.log('trackLocation called.');
+
+
+
+
+            if (navigator.geolocation) {
+
+                if(Conf.isInIframe){
+                    this._externalTracking(view);
+                }
+                else{
+                    this._internalTracking(view);
+                }
+
+            }
+            else {
+                throw new Error('Geolocation not supported!');
+            }
+
+        },
 
 
 

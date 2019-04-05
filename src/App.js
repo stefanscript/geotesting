@@ -12,6 +12,8 @@ import {
 } from "./services/hardware";
 import {Check} from "./Check";
 import {Observation} from "./Observation";
+import * as finger from "./services/fingerprint2";
+import {getHasLiedLanguages} from "./services/fingerprint2";
 
 
 const csvRow = function(dataObject, heading) {
@@ -154,6 +156,11 @@ class App extends Component {
                     {/*<Observation title={"GPU"} value={JSON.stringify(getVideoCardInfo())}/>*/}
 
                     <div className={"details"}>
+
+                        <Observation title={"HasLiedOs"} value={JSON.stringify(finger.getHasLiedOs())}/>
+                        <Observation title={"HasLiedBrowser"} value={JSON.stringify(finger.getHasLiedBrowser())}/>
+                        <Observation title={"HasLiedLanguages"} value={JSON.stringify(finger.getHasLiedLanguages())}/>
+                        <Observation title={"HasLiedResolution"} value={JSON.stringify(finger.getHasLiedResolution())}/>
 
                         <Observation title={"Language"} value={JSON.stringify(getLanguage())}/>
                         <Observation title={"Timezone IANA"} value={JSON.stringify(getTimezone())}/>

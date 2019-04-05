@@ -1,4 +1,5 @@
 import {getLanguage, getTimezone, getTimezoneOffsetVsUTC} from "./hardware";
+import * as finger from "./fingerprint2";
 
 const options = {
     enableHighAccuracy: true,
@@ -88,12 +89,24 @@ function successWatchHandler(pos) {
 export function getResult() {
     let result = 0;
     let tests = 0;
-    result += testLanguage(getLanguage());
+
+    result += finger.getHasLiedResolution() ? 0 : 100;
     tests++;
-    result += testIANATimezone(getTimezone());
+    result += finger.getHasLiedBrowser() ? 0 : 100;
     tests++;
-    result += testTimeOffsetVsUTC(getTimezoneOffsetVsUTC());
+    result += finger.getHasLiedLanguages() ? 0 : 100;
     tests++;
+    result += finger.getHasLiedOs() ? 0 : 100;
+    tests++;
+    result += finger.getHasLiedResolution() ? 0 : 100;
+    tests++;
+
+    // result += testLanguage(getLanguage());
+    // tests++;
+    // result += testIANATimezone(getTimezone());
+    // tests++;
+    // result += testTimeOffsetVsUTC(getTimezoneOffsetVsUTC());
+    // tests++;
 
     return parseInt(result/tests, 10);
 }

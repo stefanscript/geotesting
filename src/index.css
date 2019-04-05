@@ -120,7 +120,7 @@ code.index-column,
   border-radius: 50%;
   background-color: #FBD671;
   box-shadow: inset -10px -10px 0 #f8b90e;
-  transform: scale(0.8);
+  transform: scale(0.25);
   transition: all .4ms ease-in-out;
 }
 
