@@ -86,52 +86,45 @@ function successWatchHandler(pos) {
 }
 
 
-export function getResult() {
+export function getResultDeviceTrust() {
     let result = 0;
     let tests = 0;
 
-    result += finger.getHasLiedResolution() ? 0 : 100;
+    result += finger.getHasLiedOs() ? 0 : 100;
     tests++;
     result += finger.getHasLiedBrowser() ? 0 : 100;
     tests++;
     result += finger.getHasLiedLanguages() ? 0 : 100;
     tests++;
-    result += finger.getHasLiedOs() ? 0 : 100;
-    tests++;
     result += finger.getHasLiedResolution() ? 0 : 100;
     tests++;
-
+    result += hasLiedIANATimezone(getTimezone()) ? 0 : 100;
+    tests++;
+    result += hasLiedTimeZoneOffset(getTimezoneOffsetVsUTC()) ? 0 : 100;
+    tests++;
+    
     // result += testLanguage(getLanguage());
     // tests++;
-    // result += testIANATimezone(getTimezone());
-    // tests++;
-    // result += testTimeOffsetVsUTC(getTimezoneOffsetVsUTC());
-    // tests++;
+   
 
     return parseInt(result/tests, 10);
 }
 
-export function getResultSub50() {
-    return 20;
+export function hasLiedIANATimezone(timezone) {
+    return String(timezone).toLowerCase() !== "america/toronto" ;
 }
 
+export function hasLiedTimeZoneOffset(offset) {
+    let v = parseInt(offset, 10);
 
-export function getResultOver70() {
-    return 71;
+    return !(-6 <= v && v <= -4);
 }
 
-export function testIANATimezone(timezone) {
-    return String(timezone).toLowerCase() === "america/toronto" ? 100 : 0;
-}
 export function testLanguage(language) {
     //
     if(language === "en-CA" || language === "fr-CA" || language === "en") {
         return 100;
     }
-    return 0;
-}
-export function testTimeOffsetVsUTC(offset) {
-    let v = parseInt(offset, 10);
 
-    return v >= 4 && v<= 6 ? 100 : 0;
+    return 0;
 }

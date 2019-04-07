@@ -1,6 +1,13 @@
 import React from "react";
 
 export function Observation({title, value}) {
-    
-    return <code>{title}: {value}</code>
+
+    return <div className="observation">{title}: <span>{value}</span></div>
+}
+
+export function ObservationTest({title, passed}) {
+
+    return (<div className={`observation observation-test ${passed ? "" : "failed"}`}>
+        {title}: <span className={`result`}>{JSON.stringify(passed)}</span>
+    </div>)
 }

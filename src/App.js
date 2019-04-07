@@ -1,6 +1,13 @@
 import React, {Component} from 'react';
 import './App.css';
-import {geCurrentPosition, getResult, isGeoAvailable, watchPosition} from "./services/geo";
+import {
+    geCurrentPosition,
+    getResultDeviceTrust,
+    isGeoAvailable,
+    hasLiedIANATimezone,
+    watchPosition,
+    hasLiedTimeZoneOffset
+} from "./services/geo";
 import {
     devToolsOpen,
     getBrowserData,
@@ -11,7 +18,7 @@ import {
     isMobile
 } from "./services/hardware";
 import {Check} from "./Check";
-import {Observation} from "./Observation";
+import {Observation, ObservationTest} from "./Observation";
 import * as finger from "./services/fingerprint2";
 import {getHasLiedLanguages} from "./services/fingerprint2";
 
@@ -139,7 +146,7 @@ class App extends Component {
             <div className="App">
                 <header>Geolocation</header>
                 <section className="side-container">
-                    <div className={`head` + (getResult() < 50 ? " sad" : "")}>
+                    <div className={`head` + (getResultDeviceTrust() < 50 ? " sad" : "")}>
                         <div className="face">
                             <div className="mouth" />
                             <div className="eye-group">
@@ -148,7 +155,8 @@ class App extends Component {
                             </div>
                         </div>
                     </div>
-                    <div>Confidence: {getResult()}</div>
+
+                    <div>Device Confidence: {getResultDeviceTrust()}</div>
                     {/*<Observation title={"Is Mobile"} value={JSON.stringify(isMobile())}/>*/}
                     
                     {/*<Observation title={"Dev Tools"} value={devToolsOpen()}/>*/}
@@ -157,21 +165,23 @@ class App extends Component {
 
                     <div className={"details"}>
 
-                        <Observation title={"HasLiedOs"} value={JSON.stringify(finger.getHasLiedOs())}/>
-                        <Observation title={"HasLiedBrowser"} value={JSON.stringify(finger.getHasLiedBrowser())}/>
-                        <Observation title={"HasLiedLanguages"} value={JSON.stringify(finger.getHasLiedLanguages())}/>
-                        <Observation title={"HasLiedResolution"} value={JSON.stringify(finger.getHasLiedResolution())}/>
+                        <ObservationTest title={"OS ok"} passed={!finger.getHasLiedOs()}/>
+                        <ObservationTest title={"Browser ok"} passed={!finger.getHasLiedBrowser()}/>
+                        <ObservationTest title={"Languages ok"} passed={!finger.getHasLiedLanguages()}/>
+                        <ObservationTest title={"Resolution ok"} passed={!finger.getHasLiedResolution()}/>
+                        <ObservationTest
+                            title={`Timezone IANA`}
+                            passed={!hasLiedIANATimezone()}/>
+                        <ObservationTest
+                            title={`Timezone Offset`}
+                            passed={!hasLiedTimeZoneOffset()}/>
 
-                        <hr />
                         <Observation title={"Language"} value={JSON.stringify(getLanguage())}/>
-                        <Observation title={"Timezone IANA"} value={JSON.stringify(getTimezone())}/>
 
                         <Observation title={"Timezone Offset"}
                                      value={JSON.stringify(getTimezoneOffsetVsUTC()) + "hr(s)"}/>
 
 
-                        <Check title={"Geolocation API Availability"} passed={isGeoAvailable()}/>
-
                         <br />
                         <br />
                         <br />
@@ -181,6 +191,8 @@ class App extends Component {
                         <br />
                         <br />
                         <br />
+                    </div>
+                    <div className={"details"}>
                         <h1> Watch Position</h1>
                         <button onClick={this.handleWatchClick}>Start Watching Geolocation</button>
                         <code>{this.state.error}</code>
