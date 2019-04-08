@@ -146,6 +146,7 @@ class App extends Component {
             <div className="App">
                 <header>Geolocation</header>
                 <section className="side-container">
+                    
                     <div className={`head` + (getResultDeviceTrust() < 50 ? " sad" : "")}>
                         <div className="face">
                             <div className="mouth" />
