@@ -108,7 +108,8 @@ class Home extends React.Component {
     
             console.log("jitters", jitters);
             const count = jitters.filter((j) => j === 0);
-            if(count.length > 1) {
+            const halfSamples = Math.ceil(jitters.length/2);
+            if(count.length > halfSamples) {
                 this.setState({info: { message: "Current position test - Failed", passed: false, testFinished: true}});
             } else {
                 this.setState({info: {message: "Current position test - Passed", passed: true, testFinished: true}});
