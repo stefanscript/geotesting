@@ -1,3 +1,6 @@
+*, *:after, *:before {
+    box-sizing: content-box;
+}
 body {
     margin: 0;
     padding: 0;
@@ -8,6 +11,47 @@ body {
     -moz-osx-font-smoothing: grayscale;
     font-size: 16px;
     background-color: #282c34;
+    color: #fff;
+}
+header {
+    text-align: center;
+    margin: 0 auto;
+}
+
+.container {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.wrapper {
+    padding: 0 20px;
+}
+
+.sections {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+ul {
+    margin: 0;
+    padding:0;
+    display: flex;
+    flex-flow: column nowrap;
+}
+ul li {
+    flex: 1 1;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+}
+
+.position-details {
+    max-width: 400px;
+    min-width: 300px;
+    margin: 0 auto;
 }
 
 
@@ -48,12 +92,14 @@ footer {
     content: "\02705";
     position: relative;
     margin-left: 10px;
+    font-size: 0.7em;
 }
 
 .not-ok:after {
     content: "\0274C";
     position: relative;
     margin-left: 10px;
+    font-size: 0.7em;
 }
 
 .ok-face:after {
