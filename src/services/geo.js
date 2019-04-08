@@ -117,7 +117,7 @@ export function hasLiedIANATimezone(timezone) {
 export function hasLiedTimeZoneOffset(offset) {
     let v = parseInt(offset, 10);
 
-    return !(6 <= v && v <= 4);
+    return !(v <= 6 && v >= 4);
 }
 
 export function testLanguage(language) {
