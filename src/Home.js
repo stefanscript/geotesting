@@ -40,12 +40,12 @@ class Home extends React.Component {
 
         interval = setInterval(() => {
             geCurrentPosition(this.handleCurrentPosition);
-        }, 1000);
+        }, 1200);
 
         setTimeout(() => {
             clearInterval(interval);
             self.runCurrentPositionTest();
-        }, 1000 * 8);
+        }, 1200 * 9);
     }
     
     handleCurrentPosition({position, error}) {
