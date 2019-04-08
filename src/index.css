@@ -112,6 +112,10 @@ footer {
     position: relative;
 }
 
+.text-error {
+    background: #B03232;
+}
+
 .entries {
     list-style: none;
     padding: 0;

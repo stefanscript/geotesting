@@ -22,15 +22,22 @@ class Home extends React.Component {
                 message:"",
                 testFinished: false,
                 passed: false
+            },
+            infoFinal: {
+                message:"",
+                testFinished: false,
+                passed: false
             }
         };
         
         this.handleCurrentPosition = this.handleCurrentPosition.bind(this);
         this.handleWatchPosition = this.handleWatchPosition.bind(this);
+
+        this.currentTimerId = 0;
+        this.watchTimerId = 0;
     }
 
     componentDidMount() {
-        let interval;
         const self = this;
         this.setState({
             info: {
@@ -38,12 +45,12 @@ class Home extends React.Component {
             }
         });
 
-        interval = setInterval(() => {
+        this.currentTimerId = setInterval(() => {
             geCurrentPosition(this.handleCurrentPosition);
         }, 1200);
 
         setTimeout(() => {
-            clearInterval(interval);
+            clearInterval(self.currentTimerId);
             self.runCurrentPositionTest();
         }, 1200 * 9);
     }
@@ -65,30 +72,6 @@ class Home extends React.Component {
                 };
             self.setState({position: positionData});
             self.setState({currentPositions: [...self.state.currentPositions, positionData]});
-        }
-        
-        if (error) {
-            self.setState({error: error});
-        }
-    }
-    
-    handleWatchPosition({position, error}) {
-        const self = this;
-        if (position) {
-            const positionData = {
-                    coords: {
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude,
-                        accuracy: position.coords.accuracy,
-                        altitude: position.coords.altitude,
-                        altitudeAccuracy: position.coords.altitudeAccuracy,
-                        heading: position.coords.heading,
-                        speed: position.coords.speed,
-                    },
-                    timestamp: position.timestamp
-                };
-            self.setState({position: positionData});
-            self.setState({watchPositions: [...self.state.watchPositions, positionData]});
         }
         
         if (error) {
@@ -121,24 +104,45 @@ class Home extends React.Component {
         this.startWatchTest();
     }
     
-
-    
     startWatchTest() {
         if(isGeoAvailable()){
-            let watchId;
             const self = this;
             this.setState({
                 infoWatch: {
                     message: "Running watch position test....please wait"
                 }
             });
-    
-            watchId = watchPosition(this.handleWatchPosition);
+
+            self.watchTimerId = watchPosition(this.handleWatchPosition);
     
             setTimeout(() => {
-                window.navigator.geolocation.clearWatch(watchId);
+                window.navigator.geolocation.clearWatch(self.watchTimerId);
                 self.runWatchPositionTest();
-            }, 1000 * 50);
+            }, 1000 * 45);
+        }
+    }
+
+    handleWatchPosition({position, error}) {
+        const self = this;
+        if (position) {
+            const positionData = {
+                coords: {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    accuracy: position.coords.accuracy,
+                    altitude: position.coords.altitude,
+                    altitudeAccuracy: position.coords.altitudeAccuracy,
+                    heading: position.coords.heading,
+                    speed: position.coords.speed,
+                },
+                timestamp: position.timestamp
+            };
+            self.setState({position: positionData});
+            self.setState({watchPositions: [...self.state.watchPositions, positionData]});
+        }
+
+        if (error) {
+            self.setState({error: error});
         }
     }
     
@@ -155,8 +159,10 @@ class Home extends React.Component {
             const count = jitters.filter((j) => j === 0);
             if(count.length === this.state.watchPositions.length) {
                 this.setState({infoWatch: {message:"Watch position test - Failed", passed: false, testFinished: true}});
+                this.setState({infoFinal: {message:"Hmm ... not enough", passed: false, testFinished: true}});
             } else {
                 this.setState({infoWatch: {message: "Watch position test - Passed", passed: true, testFinished: true}});
+                this.setState({infoFinal: {message:"All good ... you may pass", passed: true, testFinished: true}});
             }
         } else {
             this.setState({infoWatch: {message:"Watch position test - Failed (no geo data)", passed: false, testFinished: true}});
@@ -171,8 +177,9 @@ class Home extends React.Component {
                 <div className="wrapper">
                 <div className="sections">
                     <section className={"section"}>
-                        <p className={this.state.info.testFinished ? this.state.info.passed ? "ok": "not-ok" : ""}>{this.state.info.message}</p>
-                        <p className={this.state.infoWatch.testFinished ? this.state.infoWatch.passed ? "ok": "not-ok" : ""}>{this.state.infoWatch.message}</p>
+                        <p className={`test ${this.state.info.testFinished ? this.state.info.passed ? "ok": "not-ok" : ""}`}>{this.state.info.message}</p>
+                        <p className={`test ${this.state.infoWatch.testFinished ? this.state.infoWatch.passed ? "ok": "not-ok" : ""}`}>{this.state.infoWatch.message}</p>
+                        <p className={`test ${this.state.infoFinal.testFinished ? this.state.infoFinal.passed ? "ok": "not-ok" : ""}`}>{this.state.infoFinal.message}</p>
                     </section>
                     <section className={"section"}>
                         <div className="position-details">
@@ -207,7 +214,8 @@ class Home extends React.Component {
                                     <div>{position.coords.speed}</div>
                                 </li>
                             </ul>
-                            <div>{error ? "Error: " + error : ""}</div>
+                            <br />
+                            <div className={error ? "text-error" : ""}>{error ? "Error: " + error : ""}</div>
                         </div>
                     </section>
                 
@@ -217,7 +225,16 @@ class Home extends React.Component {
             </div>
         )
     }
-    
+
+    componentWillUnmount() {
+        if(isGeoAvailable() && this.watchTimerId){
+            navigator.geolocation.clearWatch(this.watchTimerId);
+        }
+        if(this.currentTimerId){
+            clearInterval(this.currentTimerId);
+        }
+    }
+
 }
 
 export default Home;
