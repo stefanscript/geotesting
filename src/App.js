@@ -8,8 +8,8 @@ export default function App() {
         <Router basename="/geotesting">
             <header><h2>Geo Testing</h2></header>
             <Switch>
-                <Route exact path="/" component={TestingGround} />
-                <Route path="/test" component={Home} />
+                <Route exact path="/" component={Home} />
+                <Route path="/test" component={TestingGround} />
             </Switch>
         </Router>
     );
