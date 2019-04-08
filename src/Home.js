@@ -28,6 +28,25 @@ class Home extends React.Component {
         this.handleCurrentPosition = this.handleCurrentPosition.bind(this);
         this.handleWatchPosition = this.handleWatchPosition.bind(this);
     }
+
+    componentDidMount() {
+        let interval;
+        const self = this;
+        this.setState({
+            info: {
+                message:"Running current position test....please wait"
+            }
+        });
+
+        interval = setInterval(() => {
+            geCurrentPosition(this.handleCurrentPosition);
+        }, 1000);
+
+        setTimeout(() => {
+            clearInterval(interval);
+            self.runCurrentPositionTest();
+        }, 1000 * 8);
+    }
     
     handleCurrentPosition({position, error}) {
         const self = this;
@@ -78,7 +97,8 @@ class Home extends React.Component {
     }
     
     runCurrentPositionTest() {
-        if(this.state.currentPositions.count > 0){
+        console.log(this.state.currentPositions.length);
+        if(this.state.currentPositions.length > 0){
             const jitters = this.state.currentPositions.map((position, index, positions) => {
                 if(index !== 0){
                     return positions[index].timestamp - positions[index - 1].timestamp;
@@ -100,24 +120,7 @@ class Home extends React.Component {
         this.startWatchTest();
     }
     
-    componentDidMount() {
-        let interval;
-        const self = this;
-        this.setState({
-            info: {
-                message:"Running current position test....please wait"
-            }
-        });
-        
-        interval = setInterval(() => {
-            geCurrentPosition(this.handleCurrentPosition);
-        }, 1000);
-        
-        setTimeout(() => {
-            clearInterval(interval);
-            self.runCurrentPositionTest();
-        }, 1000 * 8);
-    }
+
     
     startWatchTest() {
         if(isGeoAvailable()){
@@ -139,7 +142,7 @@ class Home extends React.Component {
     }
     
     runWatchPositionTest() {
-        if(this.state.watchPositions.count > 0){
+        if(this.state.watchPositions.length > 0){
             const jitters = this.state.watchPositions.map((position, index, positions) => {
                 if(index !== 0){
                     return positions[index].timestamp - positions[index - 1].timestamp;
@@ -149,7 +152,7 @@ class Home extends React.Component {
             
             console.log("jitters", jitters);
             const count = jitters.filter((j) => j === 0);
-            if(count.length === this.state.watchPositions.count) {
+            if(count.length === this.state.watchPositions.length) {
                 this.setState({infoWatch: {message:"Watch position test - Failed", passed: false, testFinished: true}});
             } else {
                 this.setState({infoWatch: {message: "Watch position test - Passed", passed: true, testFinished: true}});
