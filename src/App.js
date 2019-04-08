@@ -5,7 +5,7 @@ import Home from "./Home";
 
 export default function App() {
     return (
-        <Router basename="/geolocation">
+        <Router basename="/geotesting">
             <header><h2>Geo Testing</h2></header>
             <Switch>
                 <Route exact path="/" component={TestingGround} />
