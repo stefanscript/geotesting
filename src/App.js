@@ -11,7 +11,7 @@ import {
 import {
     devToolsOpen,
     getBrowserData,
-    getLanguage,
+    getLanguage, getLanguages,
     getTimezone,
     getTimezoneOffsetVsUTC,
     getVideoCardInfo,
@@ -168,17 +168,25 @@ class App extends Component {
 
                         <ObservationTest title={"OS ok"} passed={!finger.getHasLiedOs()}/>
                         <ObservationTest title={"Browser ok"} passed={!finger.getHasLiedBrowser()}/>
+                        
                         <ObservationTest title={"Languages ok"} passed={!finger.getHasLiedLanguages()}/>
+                        <Observation title={"Language"} value={JSON.stringify(getLanguage())}/>
+                        <Observation title={"Languages"} value={JSON.stringify(getLanguages())}/>
+                        
                         <ObservationTest title={"Resolution ok"} passed={!finger.getHasLiedResolution()}/>
+                        
                         <ObservationTest
                             title={`Timezone IANA`}
-                            passed={!hasLiedIANATimezone()}/>
+                            passed={!hasLiedIANATimezone(getTimezone())}/>
+                            
                         <ObservationTest
                             title={`Timezone Offset`}
-                            passed={!hasLiedTimeZoneOffset()}/>
+                            passed={!hasLiedTimeZoneOffset(getTimezoneOffsetVsUTC())}/>
 
-                        <Observation title={"Language"} value={JSON.stringify(getLanguage())}/>
+                        
 
+                        <Observation title={"Timezone IANA"}
+                                     value={JSON.stringify(getTimezone())}/>
                         <Observation title={"Timezone Offset"}
                                      value={JSON.stringify(getTimezoneOffsetVsUTC()) + "hr(s)"}/>
 

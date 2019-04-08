@@ -111,10 +111,13 @@ export function getResultDeviceTrust() {
 }
 
 export function hasLiedIANATimezone(timezone) {
-    return String(timezone).toLowerCase() !== "america/toronto" ;
+    const tz = String(timezone).toLowerCase();
+    const tzs = ["america/toronto", "america/montreal"];
+    return tzs.indexOf(tz) === -1;
 }
 
 export function hasLiedTimeZoneOffset(offset) {
+    console.log(offset);
     let v = parseInt(offset, 10);
 
     return !(v <= 6 && v >= 4);
