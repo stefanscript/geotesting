@@ -20,8 +20,7 @@ export function testCurrentPositions(positions) {
             }
         }
         
-        
-        const noJitterCount = getNoJitters(positions);
+        const noJitterCount = getNoJittersCount(positions);
         const halfSamplesCount = Math.ceil(positions.length/2);
         const allSamplesCount = positions.length;
         
@@ -44,7 +43,7 @@ export function testCurrentPositions(positions) {
     return test;
 }
 
-function getNoJitters(positions) {
+function getNoJittersCount(positions) {
     const jitters = getJitters(positions);
     console.log("jitters", jitters);
     return jitters.filter((j) => j === 0).length;
@@ -78,7 +77,7 @@ export function testWatchPositions(positions) {
             }
         }
     
-        const noJitterCount = getNoJitters(positions);
+        const noJitterCount = getNoJittersCount(positions);
         if(noJitterCount === positions.length) {
             return {
                 message: `Watch position test - Failed (no jitter in ${positions.length} samples)`,
