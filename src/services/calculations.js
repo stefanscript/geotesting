@@ -22,8 +22,8 @@ export function testCurrentPositions(currentPositions) {
             test.message = `Current position - Failed (no jitter in ${allSamplesCount} samples)`;
             test.passed = false;
         } else if(noJitterCount >= halfSamplesCount) {
-            test.message = `Current position - Partially Passed (no jitter in ${noJitterCount}/${allSamplesCount} samples)`;
-            test.passed = true;
+            test.message = `Current position - Failed (no jitter in ${noJitterCount}/${allSamplesCount} samples)`;
+            test.passed = false;
         } else {
             test.message = `Current position - Passed (${allSamplesCount} samples)`;
             test.passed = true;
