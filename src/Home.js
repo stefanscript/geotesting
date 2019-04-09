@@ -55,7 +55,7 @@ class Home extends React.Component {
         setTimeout(() => {
             clearInterval(self.currentTimerId);
             self.runCurrentPositionTest();
-        }, 1200 * 9);
+        }, 1200 * 10);
     }
     
     handleCurrentPosition({position, error}) {

@@ -21,7 +21,7 @@ export function testCurrentPositions(currentPositions) {
         if(noJitterCount === allSamplesCount) {
             test.message = `Current position - Failed (no jitter in ${allSamplesCount} samples)`;
             test.passed = false;
-        } else if(noJitterCount > halfSamplesCount) {
+        } else if(noJitterCount >= halfSamplesCount) {
             test.message = `Current position - Partially Passed (no jitter in ${noJitterCount}/${allSamplesCount} samples)`;
             test.passed = true;
         } else {
@@ -60,6 +60,7 @@ export function testWatchPositions(positions) {
             test.message = `Watch position test - Passed (${positions.length} samples)`;
             test.passed = true;
         }
+        
     } else {
         test.message = "Watch position test - Failed (no geo data)";
     }
