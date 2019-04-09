@@ -1,5 +1,8 @@
 import React from 'react';
 import {isGeoAvailable, geCurrentPosition, watchPosition} from "./services/geolocation";
+import {testCurrentPositions, testWatchPositions} from "./services/calculations";
+
+const FINAL_FAIL_MESSAGE = "Hmm... not enough";
 
 class Home extends React.Component {
     constructor(props) {
@@ -80,28 +83,13 @@ class Home extends React.Component {
     }
     
     runCurrentPositionTest() {
-        console.log(this.state.currentPositions.length);
-        if(this.state.currentPositions.length > 0){
-            const jitters = this.state.currentPositions.map((position, index, positions) => {
-                if(index !== 0){
-                    return positions[index].timestamp - positions[index - 1].timestamp;
-                }
-                return 0;
-            });
-    
-            console.log("jitters", jitters);
-            const count = jitters.filter((j) => j === 0);
-            const halfSamples = Math.ceil(jitters.length/2);
-            if(count.length > halfSamples) {
-                this.setState({info: { message: "Current position test - Failed", passed: false, testFinished: true}});
-            } else {
-                this.setState({info: {message: "Current position test - Passed", passed: true, testFinished: true}});
-            }
+        const info = testCurrentPositions(this.state.currentPositions);
+        this.setState({info: {...info}});
+        if(info.passed){
+            this.startWatchTest();
         } else {
-            this.setState({info: { message: "Current position test - Failed (no geo data)", passed: false, testFinished: true}});
+            this.setState({infoFinal: {message:FINAL_FAIL_MESSAGE, passed: false, testFinished: true}});
         }
-    
-        this.startWatchTest();
     }
     
     startWatchTest() {
@@ -147,25 +135,12 @@ class Home extends React.Component {
     }
     
     runWatchPositionTest() {
-        if(this.state.watchPositions.length > 0){
-            const jitters = this.state.watchPositions.map((position, index, positions) => {
-                if(index !== 0){
-                    return positions[index].timestamp - positions[index - 1].timestamp;
-                }
-                return 0;
-            });
-            
-            console.log("jitters", jitters);
-            const count = jitters.filter((j) => j === 0);
-            if(count.length === this.state.watchPositions.length) {
-                this.setState({infoWatch: {message:"Watch position test - Failed", passed: false, testFinished: true}});
-                this.setState({infoFinal: {message:"Hmm ... not enough", passed: false, testFinished: true}});
-            } else {
-                this.setState({infoWatch: {message: "Watch position test - Passed", passed: true, testFinished: true}});
-                this.setState({infoFinal: {message:"All good ... you may pass", passed: true, testFinished: true}});
-            }
+        const infoWatch = testWatchPositions(this.state.watchPositions);
+        this.setState({infoWatch: {...infoWatch}});
+        if(infoWatch.passed){
+            this.setState({infoFinal: {message:"All good ... you may pass", passed: true, testFinished: true}});
         } else {
-            this.setState({infoWatch: {message:"Watch position test - Failed (no geo data)", passed: false, testFinished: true}});
+            this.setState({infoFinal: {message: FINAL_FAIL_MESSAGE, passed: false, testFinished: true}});
         }
     }
     
