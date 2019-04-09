@@ -1,11 +1,3 @@
-function getJitters(positions) {
-    return positions.map((position, index) => {
-        if (index !== 0) {
-            return positions[index].timestamp - positions[index - 1].timestamp;
-        }
-        return 0;
-    });
-}
 
 export function testCurrentPositions(positions) {
     let test = {
@@ -18,7 +10,7 @@ export function testCurrentPositions(positions) {
     
     if(positions.length > 0){
     
-        const bigJumps = testPositionsForJump(positions);
+        const bigJumps = hasBigPositionJumps(positions);
         
         if(bigJumps > 0) {
             return {
@@ -28,12 +20,10 @@ export function testCurrentPositions(positions) {
             }
         }
         
-        const jitters = getJitters(positions);
         
-        console.log("jitters", jitters);
-        const noJitterCount = jitters.filter((j) => j === 0).length;
-        const halfSamplesCount = Math.ceil(jitters.length/2);
-        const allSamplesCount = jitters.length;
+        const noJitterCount = getNoJitters(positions);
+        const halfSamplesCount = Math.ceil(positions.length/2);
+        const allSamplesCount = positions.length;
         
         if(noJitterCount === allSamplesCount) {
             test.message = `Current position - Failed (no jitter in ${allSamplesCount} samples)`;
@@ -54,6 +44,22 @@ export function testCurrentPositions(positions) {
     return test;
 }
 
+function getNoJitters(positions) {
+    const jitters = getJitters(positions);
+    console.log("jitters", jitters);
+    return jitters.filter((j) => j === 0).length;
+}
+
+function getJitters(positions) {
+    return positions.map((position, index) => {
+        if (index !== 0) {
+            return positions[index].timestamp - positions[index - 1].timestamp;
+        }
+        return 0;
+    });
+}
+
+
 export function testWatchPositions(positions) {
     
     let test = {
@@ -64,26 +70,46 @@ export function testWatchPositions(positions) {
     
     if(positions.length > 0){
     
-        const bigJumps = testPositionsForJump(positions);
-    
-        if(bigJumps > 0) {
+        if(hasBigPositionJumps(positions)) {
             return {
-                message: `Watch position - Failed (${bigJumps} big jumps detected)`,
+                message: `Watch position - Failed (big jumps detected)`,
                 passed: false,
                 testFinished: true
             }
         }
     
-        const jitters = getJitters(positions);
-        
-        console.log("jitters", jitters);
-        const jittersCount = jitters.filter((j) => j === 0).length;
-        if(jittersCount === positions.length) {
-            test.message = `Watch position test - Failed (no jitter in ${positions.length} samples)`;
-        } else {
-            test.message = `Watch position test - Passed (${positions.length} samples)`;
-            test.passed = true;
+        const noJitterCount = getNoJitters(positions);
+        if(noJitterCount === positions.length) {
+            return {
+                message: `Watch position test - Failed (no jitter in ${positions.length} samples)`,
+                passed: false,
+                testFinished: true
+            }
         }
+    
+        if(hasBadAccuracy(positions)) {
+            return {
+                message: `Watch position - Failed (accuracy)`,
+                passed: false,
+                testFinished: true
+            }
+        }
+        
+        
+        if(hasNoLatLongAccVariations(positions)) {
+            return {
+                message: `Watch position - Failed (not enough variations lat, long, acc)`,
+                passed: false,
+                testFinished: true
+            }
+        }
+    
+        return {
+            message: `Watch position test - Passed (${positions.length} samples)`,
+            passed: true,
+            testFinished: true
+        }
+        
         
     } else {
         test.message = "Watch position test - Failed (no geo data)";
@@ -93,29 +119,31 @@ export function testWatchPositions(positions) {
 }
 
 
-export function testPositionsForJump(positions) {
+export function hasBigPositionJumps(positions) {
     try {
         if(positions.length > 0){
             const distances = positions.map((position, index, positions) => {
                 if(index !== 0){
-                    return calcDistance(positions[index - 1], position, "K");
+                    return _calcDistance(positions[index - 1], position, "K");
                 }
                 return 0;
             });
         
             console.log("distances", distances);
-            const bigJumps = getInvalidDistances(distances, 10);
+            const bigJumps = _getInvalidDistances(distances, 10);
+            
             console.log("bigJumps", bigJumps);
-            return bigJumps.length;
+            
+            return bigJumps.length > 0;
         }
     } catch (e) {
-        return 0;
+        return false;
     }
     
-    return 0;
+    return false;
 }
 
-function calcDistance(n, m, unit) {
+function _calcDistance(n, m, unit) {
     const lat1 = m.coords.latitude;
     const lat2 = n.coords.latitude;
     const lon1 = m.coords.longitude;
@@ -139,6 +167,88 @@ function calcDistance(n, m, unit) {
         if (unit==="N") { dist = dist * 0.8684 }
         return dist;
     }
+}
+
+// assumes valid periods of time
+function _getInvalidDistances(distances, validDistance) {
+    return distances.filter((distance) => distance > validDistance);
+}
+
+
+function hasBadAccuracy(positions) {
+    try {
+        if(positions.length > 0){
+            const bad1mAccuracies = positions.filter((position) => {
+                return position.coords.accuracy === 1
+            });
+            
+            console.log("bad1mAccuracies", bad1mAccuracies);
+            return positions.length > 10 && bad1mAccuracies.length === positions.length;
+        }
+        return false;
+    } catch (e) {
+        return false;
+    }
+}
+
+function hasNoLatLongAccVariations(positions) {
+    try {
+        if(positions.length > 0){
+            const varLat = [...new Set(positions.map((position) => position.coords.latitude))];
+            const varLong = [...new Set(positions.map((position) => position.coords.longitude))];
+            const varAcc = [...new Set(positions.map((position) => position.coords.accuracy))];
+            
+            console.log("varLat", varLat);
+            console.log("varLong", varLong);
+            console.log("varAcc", varAcc);
+            
+            return positions > 10 && varLat.length > 1 && varAcc.length > 1 && varLong.length > 1;
+        }
+    } catch (e) {
+        return false;
+    }
+    
+    return false;
+}
+
+function _getUniqueValues(coordinates, property) {
+    return [...new Set( coordinates.map(n => n[property]))];
+}
+
+function testLatLongAccVariations2(positions) {
+    try {
+        if(positions.length > 0){
+            const variations = positions.filter((position, index, positions) => {
+                if(index !== 0){
+                    return _hasVariations(positions[index - 1], position);
+                }
+                return false;
+            });
+            
+            console.log("variations", variations);
+            
+            return variations.length;
+        }
+    } catch (e) {
+        return 0;
+    }
+    
+    return 0;
+}
+
+function _hasVariations(pos1, pos2) {
+    const v1 = _precise(pos1.coords.latitude - pos2.coords.latitude);
+    const v2 = _precise(pos1.coords.longitude - pos2.coords.longitude);
+    let v3 = 0;
+    if(pos1.coords.accuracy && pos2.coords.accuracy) {
+        v3 = _precise(pos1.coords.accuracy - pos2.coords.accuracy);
+    }
+    
+    return v1 > 0 || v2 > 0 || v3 > 0;
+}
+
+function _precise(x) {
+    return Number.parseFloat(Number.parseFloat(x).toPrecision(4));
 }
 
 // function distance(lon1, lat1, lon2, lat2) {
@@ -170,13 +280,10 @@ function calculateDistances(coordinates) {
     let i;
     let distances = [];
     for (i=1; i < coordinates.length-1; i++) {
-        distances.push(calcDistance(coordinates[i-1], coordinates[i], 'K'));
+        distances.push(_calcDistance(coordinates[i-1], coordinates[i], 'K'));
     }
     return distances;
 }
 
-// assumes valid periods of time
-function getInvalidDistances(distances, validDistance) {
-    return distances.filter((distance) => distance > validDistance);
-}
+
 
