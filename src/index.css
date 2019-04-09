@@ -112,6 +112,16 @@ footer {
     position: relative;
 }
 
+.test {
+    opacity: 0.8;
+    transition: all .5ms ease-in-out;
+}
+.final,
+.not-finished {
+    opacity: 1;
+}
+
+
 .text-error {
     background: #B03232;
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import {isGeoAvailable, geCurrentPosition, watchPosition} from "./services/geolocation";
 import {testCurrentPositions, testWatchPositions} from "./services/calculations";
 
-const FINAL_FAIL_MESSAGE = "Hmm... not enough";
+const FINAL_FAIL_MESSAGE = "Hmm... not enough to continue";
 
 class Home extends React.Component {
     constructor(props) {
@@ -106,7 +106,7 @@ class Home extends React.Component {
             setTimeout(() => {
                 window.navigator.geolocation.clearWatch(self.watchTimerId);
                 self.runWatchPositionTest();
-            }, 1000 * 45);
+            }, 1000 * 25);
         }
     }
 
@@ -151,10 +151,10 @@ class Home extends React.Component {
             <div className="container">
                 <div className="wrapper">
                 <div className="sections">
-                    <section className={"section"}>
-                        <p className={`test ${this.state.info.testFinished ? this.state.info.passed ? "ok": "not-ok" : ""}`}>{this.state.info.message}</p>
-                        <p className={`test ${this.state.infoWatch.testFinished ? this.state.infoWatch.passed ? "ok": "not-ok" : ""}`}>{this.state.infoWatch.message}</p>
-                        <p className={`test ${this.state.infoFinal.testFinished ? this.state.infoFinal.passed ? "ok": "not-ok" : ""}`}>{this.state.infoFinal.message}</p>
+                    <section className={"section tests"}>
+                        <p className={`test ${this.state.info.testFinished ? this.state.info.passed ? "ok": "not-ok" : "not-finished"}`}>{this.state.info.message}</p>
+                        <p className={`test ${this.state.infoWatch.testFinished ? this.state.infoWatch.passed ? "ok": "not-ok" : "not-finished"}`}>{this.state.infoWatch.message}</p>
+                        <p className={`test final ${this.state.infoFinal.testFinished ? this.state.infoFinal.passed ? "ok": "not-ok" : "not-finished"}`}>{this.state.infoFinal.message}</p>
                     </section>
                     <section className={"section"}>
                         <div className="position-details">
