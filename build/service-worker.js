@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/geotesting/precache-manifest.4455be90544531275ddc98ceded6d077.js"
+  "/geotesting/precache-manifest.986a78f042fb9514697037e845bc868c.js"
 );
 
 workbox.clientsClaim();
