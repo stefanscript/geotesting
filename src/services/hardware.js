@@ -52,25 +52,3 @@ export function getTimezone() {
     }
 
 }
-
-export function isMobile() {
-    if (window.matchMedia("(orientation: portrait)").matches) {
-        return window.matchMedia("only screen and (max-width: 760px)").matches;
-    }
-}
-
-export function devToolsOpen() {
-    // const minimalUserResponseInMiliseconds = 100;
-    // const before = new Date().getTime();
-    // debugger;
-    // const after = new Date().getTime();
-    // // user had to resume the script manually via opened dev tools
-    // return (after - before > minimalUserResponseInMiliseconds) ? "on" : "off";
-    
-    // var devtools = /./;
-    // devtools.toString = function() {
-    //     this.opened = true;
-    // }
-    //
-    // console.log('%c', devtools);
-}

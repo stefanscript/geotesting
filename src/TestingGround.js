@@ -9,18 +9,13 @@ import {
     hasLiedTimeZoneOffset
 } from "./services/geo";
 import {
-    devToolsOpen,
-    getBrowserData,
     getLanguage, getLanguages,
     getTimezone,
     getTimezoneOffsetVsUTC,
-    getVideoCardInfo,
-    isMobile
+    getVideoCardInfo
 } from "./services/hardware";
-import {Check} from "./Check";
 import {Observation, ObservationTest} from "./Observation";
 import * as finger from "./services/fingerprint2";
-import {getHasLiedLanguages} from "./services/fingerprint2";
 
 
 const csvRow = function(dataObject, heading) {

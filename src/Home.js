@@ -1,5 +1,5 @@
 import React from 'react';
-import {isGeoAvailable, geCurrentPosition, watchPosition} from "./services/geolocation";
+import {isGeoAvailable, geCurrentPosition, watchPosition} from "./services/geolocation_v2";
 import {testCurrentPositions, testWatchPositions} from "./services/calculations";
 
 const FINAL_FAIL_MESSAGE = "Hmm... not enough to continue";
@@ -50,12 +50,12 @@ class Home extends React.Component {
 
         this.currentTimerId = setInterval(() => {
             geCurrentPosition(this.handleCurrentPosition);
-        }, 1200);
+        }, 1000);
 
         setTimeout(() => {
             clearInterval(self.currentTimerId);
             self.runCurrentPositionTest();
-        }, 1200 * 10);
+        }, 1100 * 11);
     }
     
     handleCurrentPosition({position, error}) {
