@@ -14,9 +14,10 @@ export function testCurrentPositions(positions) {
         
         if(noJitterCount === allSamplesCount) {
             return _failMessage(`Current position - Failed (no jitter in ${allSamplesCount} samples)`);
-        } else if(noJitterCount >= halfSamplesCount) {
-            return _failMessage(`Current position - Failed (no jitter in ${noJitterCount}/${allSamplesCount} samples)`);
         }
+        // else if(noJitterCount >= halfSamplesCount) {
+        //     return _failMessage(`Current position - Failed (no jitter in ${noJitterCount}/${allSamplesCount} samples)`);
+        // }
     
         return _successMessage(`Current position - Passed (${allSamplesCount} samples)`);
         
