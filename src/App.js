@@ -5,12 +5,11 @@ import Home from "./Home";
 
 export default function App() {
     return (
-        <Router>
+        <Router basename="/geotesting">
             <header><h2>Geo Testing</h2></header>
             <Switch>
                 <Route exact path="/" component={Home} />
-                <Route path="test" component={TestingGround} />
-                <Route path="/geotesting/test" component={TestingGround} />
+                <Route component={TestingGround} />
             </Switch>
         </Router>
     );
