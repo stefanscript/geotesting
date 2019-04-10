@@ -9,7 +9,7 @@ export default function App() {
             <header><h2>Geo Testing</h2></header>
             <Switch>
                 <Route exact path="/" component={Home} />
-                <Route path="/test" component={TestingGround} />
+                <Route path="/geotesting/test" component={TestingGround} />
             </Switch>
         </Router>
     );
