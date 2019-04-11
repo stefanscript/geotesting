@@ -3,8 +3,8 @@ import TestingGround from "./TestingGround";
 import { BrowserRouter as Router, Route,Switch } from "react-router-dom";
 import Home from "./Home";
 
-import packageJson from '../package.json';
-const vNo = packageJson.version;
+
+const vNo = process.env.REACT_APP_VERSION;
 
 
 export default function App() {
