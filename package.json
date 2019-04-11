@@ -10,7 +10,7 @@
     "react-scripts": "2.1.8",
     "renderjson": "^1.4.0"
   },
-  "homepage": ".",
+  "homepage": "https://stefanscript.github.io/geotesting",
   "scripts": {
     "start": "react-scripts start",
     "starthttps": "HTTPS=true react-scripts start",

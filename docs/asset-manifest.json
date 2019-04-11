@@ -1,13 +1,13 @@
 {
-  "main.css": "./static/css/main.1438e6ca.chunk.css",
-  "main.js": "./static/js/main.a7eaf734.chunk.js",
-  "main.js.map": "./static/js/main.a7eaf734.chunk.js.map",
-  "runtime~main.js": "./static/js/runtime~main.d653cc00.js",
-  "runtime~main.js.map": "./static/js/runtime~main.d653cc00.js.map",
-  "static/js/2.e54ff91d.chunk.js": "./static/js/2.e54ff91d.chunk.js",
-  "static/js/2.e54ff91d.chunk.js.map": "./static/js/2.e54ff91d.chunk.js.map",
-  "index.html": "./index.html",
-  "precache-manifest.0004aa4a03151533854c9bc5da875f93.js": "./precache-manifest.0004aa4a03151533854c9bc5da875f93.js",
-  "service-worker.js": "./service-worker.js",
-  "static/css/main.1438e6ca.chunk.css.map": "./static/css/main.1438e6ca.chunk.css.map"
+  "main.css": "/geotesting/static/css/main.1438e6ca.chunk.css",
+  "main.js": "/geotesting/static/js/main.610c1023.chunk.js",
+  "main.js.map": "/geotesting/static/js/main.610c1023.chunk.js.map",
+  "runtime~main.js": "/geotesting/static/js/runtime~main.22f17e73.js",
+  "runtime~main.js.map": "/geotesting/static/js/runtime~main.22f17e73.js.map",
+  "static/js/2.e54ff91d.chunk.js": "/geotesting/static/js/2.e54ff91d.chunk.js",
+  "static/js/2.e54ff91d.chunk.js.map": "/geotesting/static/js/2.e54ff91d.chunk.js.map",
+  "index.html": "/geotesting/index.html",
+  "precache-manifest.8e7e5a27aea7f2807d7360662a0a0367.js": "/geotesting/precache-manifest.8e7e5a27aea7f2807d7360662a0a0367.js",
+  "service-worker.js": "/geotesting/service-worker.js",
+  "static/css/main.1438e6ca.chunk.css.map": "/geotesting/static/css/main.1438e6ca.chunk.css.map"
 }
