@@ -9,7 +9,7 @@ const vNo = process.env.REACT_APP_VERSION;
 
 export default function App() {
     return (
-        <Router>
+        <Router basename="/geotesting">
             <header><h2>Geo Testing {`v` + vNo}</h2></header>
             <Switch>
                 <Route exact path="/" component={Home} />
