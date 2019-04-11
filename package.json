@@ -1,6 +1,6 @@
 {
   "name": "geolocation-testing_react",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "private": true,
   "dependencies": {
     "fingerprintjs2": "^2.0.6",
