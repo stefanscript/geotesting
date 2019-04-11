@@ -13,7 +13,7 @@ export default function App() {
             <header><h2>Geo Testing {`v` + vNo}</h2></header>
             <Switch>
                 <Route exact path="/" component={Home} />
-                <Route path="test" component={TestingGround} />
+                <Route path="/test" component={TestingGround} />
             </Switch>
         </Router>
     );
